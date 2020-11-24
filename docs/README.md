@@ -2,13 +2,9 @@
 
 ## Motivation
 
-The best way to learn an algorithm is doing it with your hands! This game is designed to work with the multiple-objects detection system described in [this repository](https://github.com/quantranfr/MultiNFC).
+The best way to learn an algorithm is doing it with your hands! In that way even a complex algorithm can be come a fun game for all ages.
 
-The final product will be used in [ExploraScience Quy Nhon](http://explorascience.vn) - a science center in Vietnam.
-
-It's made in [Godot](https://godotengine.org), an open-source game engine.
-
-## Demo
+## Gameplay
 
 In this game, a player has to follow the instruction on the screen and place the right cards onto the right card readers. Let's see how quick you can finish this game!
 
@@ -17,6 +13,12 @@ Play the video below to grasp what all of this is about.
 [![](http://img.youtube.com/vi/1rLfiI8Qr10/0.jpg)](https://youtu.be/1rLfiI8Qr10)
 
 Of course it's not interesting as is. A complet sorting game (featuring bubble sort algorithm for example) with at least some more cards is on the way.
+
+## Pre-requisites
+
+Materials: This game is designed to work with the multiple-objects detection system described in [this repository](https://github.com/quantranfr/MultiNFC) and requires 3 reader modules.
+
+Installation: Download, install the open-source game engine [Godot](https://godotengine.org) and open the `.project` file in this repository. Enjoy the game.
 
 ## Simulation without physical objects
 
