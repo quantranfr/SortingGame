@@ -4,40 +4,28 @@ const WRONG=0
 const NOT_YET=-1
 const CORRECT=2
 
-var score # elapsed time
-var qno   # question number
+var score=0 # = elapsed time
+var qno=-1   # question number
 
 var cards = { # number written on cards
-	"C1": "1",
-	"C2": "2",
-	"C3": "3",
-	"C4": "4",
-	"C5": "5",
-	"C6": "6",
-	"C7": "7",
-	"C8": "8",
-	"C9": "9",
-	"C0": "0",
+	"C0 D6 16 32": "7",
+	"37 5F D1 3C": "8",
+	"62 C9 B1 A9": "9",
 }
 
 var readers = { # position of each reader in the row
-	"R0": 0,
-	"R1": 1,
-	"R2": 2,
-	"R3": 3,
-	"R4": 4,
-	"R5": 5,
-	"R6": 6,
-	"R7": 7,
+	"R1": 0,
+	"R2": 1,
+	"R3": 2,
 }
 
-var states = ["", "", ""] # suppose that the 3 slots are empty
+var states = ["", "", ""] # suppose that the 3 slots are initially empty
 
 var questions = [
 	"Đặt số 9 vào ô thứ nhất",
-	"Đặt số 8 vào ô thứ hai",
-	"Đặt số 7 vào ô thứ ba",
-	"Đổi chỗ nếu số thứ nhất lớn hơn số thứ hai",
+	"Đặt tiếp số 8 vào ô thứ hai",
+	"Đặt tiếp số 7 vào ô thứ ba",
+	"Đổi chỗ nếu số ở ô thứ nhất lớn hơn số ở ô thứ hai",
 ]
 
 var answers = [ # numbers in the row, "" for empty
@@ -47,43 +35,52 @@ var answers = [ # numbers in the row, "" for empty
 	["8", "9", "7"],
 ]
 
-func add_card(cardID, readerID):
-	var reader_pos = readers[readerID]
-	var number = cards[cardID]
-	states[reader_pos] = number
-	
-func remove_card(readerID):
-	var reader_pos = readers[readerID]
-	states[reader_pos] = ""
-
 func update_states(s):
 	"""
 	This is the key function linking the game logic and the websocket communication.
 	
-	s is the message coming from websocket, of format <action>:[<cardID>:]<readerID>
-	with <action> is either 'ADD' or 'REMOVE'
+	s is the message coming from websocket, of format 
+	<reader1>:<card1>;<reader2>:<card2>;…
+	if no card on it, the reader will not be shown
 	"""
-	if ':' in s:
-		var action = s.split(':')[0]
-		if action == 'ADD':
-			var cardID = s.split(':')[1]
-			var readerID = s.split(':')[2]
-			add_card(cardID, readerID)
-			check_states() # don't check when removing cards (to swap cards for example)
-		elif action == 'REMOVE':
-			var readerID = s.split(':')[1]
-			remove_card(readerID)
+
+	var last_states = states.duplicate()
+
+	# parse message to a dict {readerID:cardID}
+	var s_parsed = {} # there no dict comprehension in GDScript
+	for part in s.split(';'):
+		if part != "":
+			s_parsed[part.split(':')[0]] = part.split(':')[1]
+
+	# loop through known readers to get new states
+	var pos: int
+	var cardID: String
+	for readerID in readers:
+		pos = readers[readerID]
+		if readerID in s_parsed:
+			cardID = s_parsed[readerID]
+			states[pos] = cards[cardID]
 		else:
-			pass # do nothing for now
-	
+			states[pos] = ""
+
 	$HBoxContainer/MarginContainer/ColorRect/Label.text = str(states[0])
 	$HBoxContainer/MarginContainer2/ColorRect/Label.text = str(states[1])
 	$HBoxContainer/MarginContainer3/ColorRect/Label.text = str(states[2])
 	
+	# compare with last states, if user's action is only removing cards,
+	# then don't check for validity
+	var is_removing = false
+	for i in range(len(states)):
+		if last_states[i] != "" and states[i] == "":
+			is_removing = true
+	if not is_removing:	
+		check_states()
+	
 func check_states():
 	"""
-	Compare with the answer. Using global variable `qno`.
-	Return either CORRECT, WRONG, or NOT_YET as a whole (not vs. last reader)
+	Compare with the answer. Using the global variable `qno`.
+	Return either CORRECT, WRONG, or NOT_YET
+	Don't use this function when the user is removing cards (to swap cards for example)
 	"""
 	var answer = answers[qno]
 	var check = CORRECT
@@ -96,11 +93,7 @@ func check_states():
 	
 	if check != NOT_YET:
 		if check == CORRECT:
-			qno += 1
-			if qno < len(questions):
-				show_question()
-			else:
-				victory()
+			next_question()
 		else:
 			game_over()
 
@@ -121,18 +114,24 @@ func victory():
 	
 func new_game():
 	score = 0
-	qno = 0
+	qno = -1
 	states = ["", "", ""]
-	update_states("")
+	$HBoxContainer/MarginContainer/ColorRect/Label.text = ""
+	$HBoxContainer/MarginContainer2/ColorRect/Label.text = ""
+	$HBoxContainer/MarginContainer3/ColorRect/Label.text = ""
 	$StartTimer.start()
 	$HUD.update_score(score)
 	$HUD.show_message("Sẵn sàng")
 	$Music.play()
-	show_question()
-	
-func show_question():
-	$QuestionLabel.text = questions[qno]
+	next_question()
 
+func next_question():
+	qno += 1
+	if qno < len(questions):
+		$QuestionLabel.text = questions[qno]
+	else:
+		victory()
+	
 func _on_StartTimer_timeout():
 	$ScoreTimer.start()
 	$QuestionLabel.show()
@@ -192,7 +191,8 @@ func _on_data(id):
 	var pkt = _server.get_peer(id).get_packet()
 	var s = pkt.get_string_from_utf8()
 	print("Got data from client %d: %s" % [id, s])
-	update_states(s)
+	if $ScoreTimer.time_left > 0: # processing incoming message during gameplay only
+		update_states(s)
 	# _server.get_peer(id).put_packet(pkt) # send back data
 
 func _process(delta):
