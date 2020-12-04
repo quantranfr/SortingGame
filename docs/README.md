@@ -16,11 +16,24 @@ Of course it's not interesting as is. A complet sorting game (featuring bubble s
 
 ## Pre-requisites
 
-Materials: This game is designed to work with the multiple-objects detection system described in [this repository](https://github.com/quantranfr/MultiNFC) and requires 3 reader modules.
+Materials:
 
-Installation: Download, install the open-source game engine [Godot](https://godotengine.org) and open the `.project` file in this repository. Enjoy the game.
+* 3 NFC reader modules as in [my multiple-objects detection system](https://github.com/quantranfr/MultiNFC).
+* Raspberry Pi (tested with MacOS) or any Linux-like machine.
 
-## Simulation without physical objects
+Softwares and libraries:
+
+* Download, install the open-source game engine [Godot](https://godotengine.org);
+* Download [MultiNFC](https://github.com/quantranfr/MultiNFC)
+
+## Run the game
+
+Steps to follow to run the game:
+
+* Open the `.project` file in this repository with Godot and run the game (or export it to a standalone application and run).
+* Run `python readSerial.py` in MultiNFC.
+
+## Simulation without NFC reader modules
 
 To test this game without having to worry about physical objects, we have to do some simulation. Here are the steps to do it:
 
