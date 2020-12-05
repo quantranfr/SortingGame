@@ -23,7 +23,13 @@ Materials:
 
 Softwares and libraries:
 
-* Download, install the open-source game engine [Godot](https://godotengine.org);
+* Download, install the open-source game engine [Godot](https://godotengine.org). For Pi:
+
+  * Download Godot's [source code](https://github.com/godotengine/godot/releases/tag/3.2.3-stable);
+  * Install Clang 9 [like this](https://solarianprogrammer.com/2018/04/22/raspberry-pi-raspbian-install-clang-compile-cpp-17-programs/);
+  * Change the first line of `$(which scons)` file to `#! /usr/bin/python3`;
+  * Go to the the source code root folder and compile with `scons platform=x11 use_llvm=yes` as instructed [here](https://docs.godotengine.org/en/stable/development/compiling/compiling_for_x11.html).
+  
 * Download [MultiNFC](https://github.com/quantranfr/MultiNFC)
 
 ## Run the game
