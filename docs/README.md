@@ -23,12 +23,12 @@ Materials:
 
 Softwares and libraries:
 
-* Download, install the open-source game engine [Godot](https://godotengine.org). For Pi:
+* Download, install the open-source game engine [Godot](https://godotengine.org). For Pi 4b:
 
   * Download Godot's [source code](https://github.com/godotengine/godot/releases/tag/3.2.3-stable);
   * Install Clang 9 [like this](https://solarianprogrammer.com/2018/04/22/raspberry-pi-raspbian-install-clang-compile-cpp-17-programs/);
   * Change the first line of `$(which scons)` file to `#! /usr/bin/python3`;
-  * Go to the the source code root folder and compile with `scons platform=x11 use_llvm=yes` as instructed [here](https://docs.godotengine.org/en/stable/development/compiling/compiling_for_x11.html).
+  * Go to the the source code's root folder and compile with `scons platform=x11 use_llvm=yes` as instructed [here](https://docs.godotengine.org/en/stable/development/compiling/compiling_for_x11.html).
   
 * Download [MultiNFC](https://github.com/quantranfr/MultiNFC)
 
@@ -36,7 +36,9 @@ Softwares and libraries:
 
 Steps to follow to run the game:
 
-* Open the `.project` file in this repository with Godot and run the game (or export it to a standalone application and run).
+* Open the `.project` file in this repository with Godot;
+* Going into *Project settings/Rendering/Quality/Driver name* and change the video driver to GLES2;
+* Run the game (or export it to a standalone application and run);
 * Run `python readSerial.py` in MultiNFC.
 
 ## Simulation without NFC reader modules
