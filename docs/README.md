@@ -23,32 +23,41 @@ Materials:
 
 Softwares and libraries:
 
-* Download, install the open-source game engine [Godot](https://godotengine.org). For Pi 4b:
+* [No need if all you want to do is to run a released version] Download, install the open-source game engine [Godot](https://godotengine.org). For Pi 4b:
 
   * Download Godot's [source code](https://github.com/godotengine/godot/releases/tag/3.2.3-stable);
   * Install Clang 9 [like this](https://solarianprogrammer.com/2018/04/22/raspberry-pi-raspbian-install-clang-compile-cpp-17-programs/);
   * Change the first line of `$(which scons)` file to `#! /usr/bin/python3`;
   * Go to the the source code's root folder and compile with `scons platform=x11 use_llvm=yes` as instructed [here](https://docs.godotengine.org/en/stable/development/compiling/compiling_for_x11.html).
-  
+
 * Download [MultiNFC](https://github.com/quantranfr/MultiNFC)
 
 ## Run the game
 
 Steps to follow to run the game:
 
-* Open the `.project` file in this repository with Godot;
-* Going into *Project settings/Rendering/Quality/Driver name* and change the video driver to GLES2;
-* Run the game (or export it to a standalone application and run);
-* Run `python readSerial.py` in MultiNFC.
+* Run `python readSerial.py` in [MultiNFC](https://github.com/quantranfr/MultiNFC);
+* Depending on the version, the game may have been exported to a native/HTML application or not:
 
-## Simulation without NFC reader modules
+  * If the game is available as an HTML application:
+
+    * In a terminal, `cd` to the folder containing the main `.html` file;
+    * Run `python3 -m http.server`;
+    * Go to `http://localhost:8000/` in **Chrome** (didn't work in Safari).
+
+  * If the game is not available as an application:
+
+    * Open the `.project` file in this repository with Godot;
+    * Going into *Project settings/Rendering/Quality/Driver name* and change the video driver to GLES2;
+    * Run the game (or export it to a native/HTML application).
+
+## Run the game without NFC reader modules
 
 To test this game without having to worry about physical objects, we have to do some simulation. Here are the steps to do it:
 
-* Install `python` and the `websockets` module;
-* Run the game;
-* Run `python -m websockets ws://127.0.0.1:9080` in your terminal;
-* At the prompt, simulate action with the `<reader1:card1>;<reader2:card2>;…` syntax. Note that only readers with a card on it need to be mentioned. For example, the following commands will lead to a win (at the time of writing):
+* In a terminal, run `python readSerial_mockup.py` in [MultiNFC](https://github.com/quantranfr/MultiNFC);
+* Then run the game as described above;
+* To win the game, return to the terminal and type (note that only readers with a card on it need to be mentioned):
 
 ```
 R1:62 C9 B1 A9

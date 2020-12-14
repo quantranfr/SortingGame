@@ -147,55 +147,43 @@ func _on_ScoreTimer_timeout():
 # The port we will listen to
 const PORT = 9080
 # Our WebSocketServer instance
-var _server = WebSocketServer.new()
+var ws = null
 
 # Called when the node enters the scene tree for the first time.
 
 func _ready():
-	
-	# Connect base signals to get notified of new client connections,
-	# disconnections, and disconnect requests.
-	_server.connect("client_connected", self, "_connected")
-	_server.connect("client_disconnected", self, "_disconnected")
-	_server.connect("client_close_request", self, "_close_request")
-	# This signal is emitted when not using the Multiplayer API every time a
-	# full packet is received.
+	ws = WebSocketClient.new()
+	ws.connect("connection_established", self, "_connection_established")
+	ws.connect("connection_closed", self, "_connection_closed")
+	ws.connect("connection_error", self, "_connection_error")
+
 	# Alternatively, you could check get_peer(PEER_ID).get_available_packets()
 	# in a loop for each connected peer.
-	_server.connect("data_received", self, "_on_data")
-	# Start listening on the given port.
-	var err = _server.listen(PORT)
-	if err != OK:
-		print("Unable to start server")
-		set_process(false)
+	ws.connect("data_received", self, "_on_data")
+	
+	var url = "ws://localhost:" + str(PORT)
+	print("Connecting to " + url)
+	ws.connect_to_url(url)
+	
+func _connection_established(protocol):
+	print("Connection established with protocol: ", protocol)
+	
+func _connection_closed():
+	print("Connection closed")
 
-func _connected(id, proto):
-	# This is called when a new peer connects, "id" will be the assigned peer id,
-	# "proto" will be the selected WebSocket sub-protocol (which is optional)
-	print("Client %d connected with protocol: %s" % [id, proto])
-
-func _close_request(id, code, reason):
-	# This is called when a client notifies that it wishes to close the connection,
-	# providing a reason string and close code.
-	print("Client %d disconnecting with code: %d, reason: %s" % [id, code, reason])
-
-func _disconnected(id, was_clean = false):
-	# This is called when a client disconnects, "id" will be the one of the
-	# disconnecting client, "was_clean" will tell you if the disconnection
-	# was correctly notified by the remote peer before closing the socket.
-	print("Client %d disconnected, clean: %s" % [id, str(was_clean)])
-
-func _on_data(id):
+func _connection_error():
+	print("Connection error")
+	
+func _on_data():
 	# Print the received packet, you MUST always use get_peer(id).get_packet to receive data,
 	# and not get_packet directly when not using the MultiplayerAPI.
-	var pkt = _server.get_peer(id).get_packet()
+	var pkt = ws.get_peer(1).get_packet()
 	var s = pkt.get_string_from_utf8()
-	print("Got data from client %d: %s" % [id, s])
+	print("< %s" %s)
 	if $ScoreTimer.time_left > 0: # processing incoming message during gameplay only
 		update_states(s)
 	# _server.get_peer(id).put_packet(pkt) # send back data
 
 func _process(delta):
-	# Call this in _process or _physics_process.
-	# Data transfer, and signals emission will only happen when calling this function.
-	_server.poll()
+	if ws.get_connection_status() == ws.CONNECTION_CONNECTING || ws.get_connection_status() == ws.CONNECTION_CONNECTED:
+		ws.poll()
