@@ -36,7 +36,7 @@ Softwares and libraries:
 
 Steps to follow to run the game:
 
-* Run `python readSerial.py` in [MultiNFC](https://github.com/quantranfr/MultiNFC);
+* Run `python readSerial.py` in [MultiNFC](https://github.com/quantranfr/MultiNFC) branch as_server;
 * Depending on the version, the game may have been exported to a native/HTML application or not:
 
   * If the game is available as an HTML application:
@@ -55,7 +55,7 @@ Steps to follow to run the game:
 
 To test this game without having to worry about physical objects, we have to do some simulation. Here are the steps to do it:
 
-* In a terminal, run `python readSerial_mockup.py` in [MultiNFC](https://github.com/quantranfr/MultiNFC);
+* In a terminal, run `python readSerial_mockup.py` in [MultiNFC](https://github.com/quantranfr/MultiNFC) branch as_server;
 * Then run the game as described above;
 * To win the game, return to the terminal and type (note that only readers with a card on it need to be mentioned):
 
